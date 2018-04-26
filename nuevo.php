@@ -152,6 +152,7 @@ require('connect.php');
                   $nota ="Proyecto creado";
                   $queryAddNota = $connection->prepare('INSERT INTO NOTAS_PROYECTOS(USUARIO,PROYECTO, NOTA) VALUES(1,?,?)');
                   $queryAddNota->bind_param('is',$IDProyecto,$nota);
+                  $queryAddNota->execute();
                   ?>
                   <div class="alert alert-success">
                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
