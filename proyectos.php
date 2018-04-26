@@ -47,7 +47,7 @@ require('utils.php');
 
                 </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="index.php">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
                         </a>
@@ -185,7 +185,7 @@ if($queryProyectosAll->num_rows!=0)
 
                                                 } ?></td>
                                                 <td>
-                                                  <button type="submit" name = "submit" value="<?php echo $filaProyectosAll['ID']; ?>" rel="tooltip" title="Ver proyecto" class="btn btn-link btn-sm">
+                                                  <button type="submit" name = "submit" value="<?php echo $filaProyectosAll['ID']; ?>" rel="tooltip" title="Ver proyecto" class="btn btn-warning btn-link btn-sm">
                                                       <i class="material-icons">visibility</i>
                                                   </button>
                                                 </td>

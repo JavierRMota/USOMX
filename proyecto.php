@@ -3,6 +3,7 @@ if(isset($_POST['submit']))
 {
   require('connect.php');
   require('utils.php');
+  $IDProyecto= $_POST['submit'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -15,7 +16,7 @@ if(isset($_POST['submit']))
     <link rel="apple-touch-icon" href="../assets/img/apple-icon.png">
     <link rel="icon" href="../assets/img/favicon.png">
     <title>
-        USO Inteligente - Inicio
+        USO Inteligente - Proyecto
     </title>
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
@@ -48,13 +49,13 @@ if(isset($_POST['submit']))
                         </center>
 
                 </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item active">
                         <a class="nav-link" href="proyectos.php">
                             <i class="material-icons">book</i>
                             <p>Proyectos</p>
@@ -81,7 +82,7 @@ if(isset($_POST['submit']))
             <nav class="navbar navbar-expand-lg navbar-transparent  navbar-absolute fixed-top">
                 <div class="container-fluid">
                     <div class="navbar-wrapper">
-                        <a class="navbar-brand" href="#">Dashboard General de Proyectos</a>
+                        <a class="navbar-brand" href="#">Resumen de proyecto</a>
                     </div>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="sr-only">Toggle navigation</span>
@@ -125,121 +126,206 @@ if(isset($_POST['submit']))
             <!-- End Navbar -->
             <div class="content">
                 <div class="container-fluid">
-                    <div class="row">
+
 <?php
-$queryUltimoMes = $connection->query('SELECT * FROM UltimoMes');
-if($queryUltimoMes->num_rows!=0)
+$queryProyecto = $connection->query('SELECT * FROM PROYECTOS WHERE ID = '.$IDProyecto);
+if($queryProyecto->num_rows!=0)
 {
+  $filaProyecto = $queryProyecto->fetch_assoc();
 ?>
-                        <div class="col-lg-6 col-md-12">
-                            <div class="card">
-                                <div class="card-header card-header-warning">
-                                    <h4 class="card-title">Estados del proyecto</h4>
-                                    <p class="card-category">Cambios de estado</p>
-                                </div>
-                                <div class="card-body table-responsive">
-                                    <table class="table table-hover">
-                                        <thead class="text-warning">
-                                            <th>Clave</th>
-                                            <th>Nombre</th>
-                                            <th>Categorías</th>
-                                            <th>Presupuesto</th>
-                                            <th>Estado</th>
-                                        </thead>
-                                        <tbody>
-                                          <?php
-                                          while($filaUltimoMes = $queryUltimoMes->fetch_assoc())
-                                          {
-                                          ?>
-                                            <tr>
-                                                <td><?php echo $filaUltimoMes['ID']; ?></td>
-                                                <td><?php echo $filaUltimoMes['NOMBRE']; ?></td>
-                                                <td><?php
-                                                  $categoriaProyectoQuery = $connection->query('SELECT CATEGORIAS.NOMBRE FROM CATEGORIA_PROYECTO INNER JOIN CATEGORIAS ON CATEGORIA_PROYECTO.CATEGORIA = CATEGORIAS.ID WHERE CATEGORIA_PROYECTO.PROYECTO = '.$filaUltimoMes['ID']);
-                                                  if($categoriaProyectoQuery->num_rows!=0)
-                                                  {
-                                                    while($filaCategoriaProyecto = $categoriaProyectoQuery->fetch_assoc())
-                                                    {
-                                                      echo $filaCategoriaProyecto['NOMBRE'];
-                                                      echo "<br/>";
-                                                    }
-                                                  }
-                                                  else
-                                                  {
-                                                    echo "SIN CATEGORIA";
-                                                  }
-                                                 ?></td>
-                                                <td><?php echo $filaUltimoMes['PRESUPUESTO']; ?></td>
-                                                <td><?php switch($filaUltimoMes['ESTADO'])
-                                                {
-                                                  case 'EPC':
-                                                  echo "En proceso";
-                                                  break;
-                                                  case 'COM':
-                                                  echo "Completado";
-                                                  break;
-                                                  case 'CAN':
-                                                  echo "Cancelado";
-                                                  break;
+<div class="row">
+<div class="col-md-8">
+    <div class="card">
+        <div class="card-header card-header-warning">
+            <h4 class="card-title">Vista del proyecto</h4>
+            <p class="card-category">Editar o cambiar los datos</p>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row">
+                  <input hidden name="idProyectoInput" value="<?php echo $IDProyecto;?>">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="bmd-label-floating">Estado</label>
+                            <select class="form-control" name="estadoProyectoInput" id="estadoProyectoInput">
+                              <option selected disabled value="">SELECCIONAR ESTADO</option>
+                              <option value="EPC">En Proceso</option>
+                              <option value="COM">Completado</option>
+                              <option value="CAN">Cancelado</option>
+                            </select>
+                            <?php
+                            $estadoActualQuery = $connection->query("SELECT * FROM ESTADO_PROYECTOS WHERE PROYECTO = ".$IDProyecto." ORDER BY FECHA DESC LIMIT 1");
+                            if($estadoActualQuery->num_rows!=0)
+                            {
+                              $filaEstadoActual = $estadoActualQuery->fetch_assoc();
+                              ?>
+                              <script>
+                              document.getElementById('estadoProyectoInput').value='<?php echo $filaEstadoActual['ESTADO']; ?>';
+                              </script>
+                              <?php
+                            }
+                            ?>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="bmd-label-floating">Presupuesto</label>
+                            <input name="presupuestoProyectoInput" type="number" step="0.01" value="<?php echo $filaProyecto['PRESUPUESTO']; ?>" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Diagnóstico</label>
+                            <div class="form-group">
+                                <textarea class="form-control" rows="5"><?php echo $filaProyecto['DIAGNOSTICO']; ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-warning pull-right">Editar proyecto</button>
+                <div class="clearfix"></div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="card card-profile">
+        <div class="card-body">
+            <h6 class="card-category text-gray"><?php echo $filaProyecto['OBJETIVO']; ?></h6>
+            <h2 class="card-title"><?php echo $filaProyecto['NOMBRE']; ?></h2>
+            <p class="card-description">
+                <?php echo $filaProyecto['INTRODUCCION']; ?>
+            </p>
+        </div>
+    </div>
+</div>
+</div>
+<div class="row">
+  <?php
+  $queryNotasProyecto = $connection->query('SELECT * FROM NOTAS_PROYECTOS WHERE PROYECTO = '.$IDProyecto);
+  if($queryNotasProyecto->num_rows!=0)
+  {
+  ?>
+                          <div class="col-lg-6 col-md-12">
+                              <div class="card">
+                                  <div class="card-header card-header-primary">
+                                      <h4 class="card-title">Notas</h4>
+                                      <p class="card-category">Histórico de notas</p>
+                                  </div>
+                                  <div class="card-body table-responsive">
+                                      <table class="table table-hover">
+                                          <thead class="text-primary">
+                                              <th>Fecha</th>
+                                              <th>Nota</th>
+
+                                          </thead>
+                                          <tbody>
+                                            <?php
+                                            while($filaNotasProyecto = $queryNotasProyecto->fetch_assoc())
+                                            {
+                                            ?>
+                                              <tr>
+                                                  <td><?php echo $filaNotasProyecto['FECHA']; ?></td>
+                                                  <td><?php echo $filaNotasProyecto['NOTA']; ?></td>
+
+                                              </tr>
 
 
-                                                } ?></td>
-                                            </tr>
+                          <?php
+                          }
+                          ?>
+                        </tbody>
+                    </table>
+                    <form>
+                      <div class="row">
+                          <div class="col-md-12">
+                              <div class="form-group">
+                                  <label>Nueva nota</label>
+                                  <div class="form-group">
+                                      <textarea class="form-control" rows="2"></textarea>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <button type="submit" class="btn btn-primary pull-right">Añadir nota</button>
+                    </form>
 
-
-                        <?php
+                </div>
+            </div>
+        </div>
+                          <?php
                         }
-                        ?>
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-      </div>
+                          ?>
+                          <?php
+                          $estadoProyectoQuery = $connection->query("SELECT * FROM ESTADO_PROYECTOS WHERE PROYECTO = ".$IDProyecto);
+                          if($estadoProyectoQuery->num_rows!=0)
+                          {
+                            ?>
+                            <div class="col-lg-6 col-md-12">
+                              <div class="card">
+                                  <div class="card-header card-header-success">
+                                      <h4 class="card-title">Estado del proyecto</h4>
+                                      <p class="card-category">Información histórica</p>
+                                  </div>
+                                  <div class="card-body table-responsive">
+                                      <table class="table table-hover">
+                                          <thead class="text-success">
+                                              <th>Fecha</th>
+                                              <th>Estado</th>
+                                          </thead>
+                                          <tbody>
+                                          <?php
+
+                                                      while($filaEstados = $estadoProyectoQuery->fetch_assoc()){
+                                                        ?>
+                                                        <tr>
+                                                            <td><?php echo $filaEstados['FECHA']; ?></td>
+                                                            <td><?php switch($filaEstados['ESTADO'])
+                                                            {
+                                                              case 'EPC':
+                                                              echo "En proceso";
+                                                              break;
+                                                              case 'COM':
+                                                              echo "Completado";
+                                                              break;
+                                                              case 'CAN':
+                                                              echo "Cancelado";
+                                                              break;
+
+
+                                                            } ?></td>
+                                                          </tr>
+                                                        <?php
+
+                                                      }
+                                          ?>
+                                          </tbody>
+                                      </table>
+                                  </div>
+                              </div>
+                            </div>
+                            <?php
+
+                          }
+                          ?>
+</div>
                         <?php
                       }
+                      else
+                      {
+
+
                         ?>
+                        <div class="col-lg-6 col-md-12"><h1> Algo salió mal y no pudimos encontrar el proyecto</h1></div>
                         <?php
-                        $categoriasQuery = $connection->query("SELECT * FROM CATEGORIAS");
-                        if($categoriasQuery->num_rows!=0)
-                        {
-                          ?>
-                          <div class="col-lg-6 col-md-12">
-                            <div class="card">
-                                <div class="card-header card-header-success">
-                                    <h4 class="card-title">Notas de proyecto</h4>
-                                    <p class="card-category">Histórico de notas</p>
-                                </div>
-                                <div class="card-body table-responsive">
-                                    <table class="table table-hover">
-                                        <thead class="text">
-                                            <th>ID</th>
-                                            <th>Nombre</th>
-                                        </thead>
-                                        <tbody>
-                                        <?php
-
-                                                    while($filaCategorias = $categoriasQuery->fetch_assoc()){
-                                                      ?>
-                                                      <tr>
-                                                          <td><?php echo $filaCategorias['ID']; ?></td>
-                                                          <td><?php echo $filaCategorias['NOMBRE']; ?></td>
-                                                        </tr>
-                                                      <?php
-
-                                                    }
-                                        ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                          </div>
-                          <?php
-
                         }
-                        ?>
+
+                          ?>
 
 
-                    </div>
+
                     </div>
                 </div>
             </div>
