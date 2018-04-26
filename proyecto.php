@@ -128,6 +128,41 @@ if(isset($_POST['submit']))
                 <div class="container-fluid">
 
 <?php
+if(isset($_POST['editarSubmit']))
+{
+  $estado= $_POST['estadoProyectoInput'];
+  $presupuesto = $_POST['presupuestoProyectoInput'];
+  $diagnostico = $_POST['diagnosticoProyectoInput'];
+  $queryProyecto = $connection->query('SELECT * FROM PROYECTOS WHERE ID = '.$IDProyecto);
+  if($queryProyecto->num_rows!=0)
+  {
+    $filaProyecto = $queryProyecto->fetch_assoc();
+    if($filaProyecto['DIAGNOSTICO']!=$diagnostico || $filaProyecto['PRESUPUESTO']!= $presupuesto)
+    {
+      $modificacionQuery = $connection->prepare('UPDATE PROYECTOS SET DIAGNOSTICO = ?, PRESUPUESTO = ? WHERE ID = '.$IDProyecto);
+      $modificacionQuery->bind_param('ss',$diagnostico,$presupuesto);
+      $modificacionQuery->execute();
+    }
+  }
+  $estadoActualQuery = $connection->query("SELECT * FROM ESTADO_PROYECTOS WHERE PROYECTO = ".$IDProyecto." ORDER BY FECHA DESC LIMIT 1");
+  if($estadoActualQuery->num_rows!=0)
+  {
+    $filaEstadoActual = $estadoActualQuery->fetch_assoc();
+    if($estado != $filaEstadoActual['ESTADO'])
+    {
+      $estadoQuery = $connection->prepare("INSERT INTO ESTADO_PROYECTOS(PROYECTO,ESTADO) VALUES(?,?)");
+      $estadoQuery->bind_param('is',$IDProyecto,$estado);
+      $estadoQuery->execute();
+    }
+  }
+  else
+  {
+    $estadoQuery = $connection->prepare("INSERT INTO ESTADO_PROYECTOS(PROYECTO,ESTADO) VALUES(?,?)");
+    $estadoQuery->bind_param('is',$IDProyecto,$estado);
+    $estadoQuery->execute();
+  }
+
+}
 $queryProyecto = $connection->query('SELECT * FROM PROYECTOS WHERE ID = '.$IDProyecto);
 if($queryProyecto->num_rows!=0)
 {
@@ -141,9 +176,9 @@ if($queryProyecto->num_rows!=0)
             <p class="card-category">Editar o cambiar los datos</p>
         </div>
         <div class="card-body">
-            <form>
+            <form method="post">
                 <div class="row">
-                  <input hidden name="idProyectoInput" value="<?php echo $IDProyecto;?>">
+                  <input hidden name="submit" value="<?php echo $IDProyecto;?>">
                     <div class="col-md-4">
                         <div class="form-group">
                             <label class="bmd-label-floating">Estado</label>
@@ -179,12 +214,12 @@ if($queryProyecto->num_rows!=0)
                         <div class="form-group">
                             <label>Diagnóstico</label>
                             <div class="form-group">
-                                <textarea class="form-control" rows="5"><?php echo $filaProyecto['DIAGNOSTICO']; ?></textarea>
+                                <textarea name="diagnosticoProyectoInput" class="form-control" rows="5"><?php echo $filaProyecto['DIAGNOSTICO']; ?></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-warning pull-right">Editar proyecto</button>
+                <button type="submit" name="editarSubmit" class="btn btn-warning pull-right">Editar proyecto</button>
                 <div class="clearfix"></div>
             </form>
         </div>
@@ -204,7 +239,27 @@ if($queryProyecto->num_rows!=0)
 </div>
 <div class="row">
   <?php
-  $queryNotasProyecto = $connection->query('SELECT * FROM NOTAS_PROYECTOS WHERE PROYECTO = '.$IDProyecto);
+  if(isset($_POST['addNoteSubmit']) && isset($_POST['notaInput']))
+  {
+    $nota = $_POST['notaInput'];
+    $queryAddNota = $connection->prepare('INSERT INTO NOTAS_PROYECTOS(USUARIO,PROYECTO, NOTA) VALUES(1,?,?)');
+    $queryAddNota->bind_param('is',$IDProyecto,$nota);
+    if(!$queryAddNota->execute())
+    {
+      ?>
+      <div class="alert alert-danger">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <i class="material-icons">close</i>
+          </button>
+          <span>
+              <b> ERROR - </b> Algo salió mal al intentar ingresar la nota</span>
+      </div>
+
+      <?php
+    }
+
+  }
+  $queryNotasProyecto = $connection->query('SELECT * FROM NOTAS_PROYECTOS WHERE PROYECTO = '.$IDProyecto.' ORDER BY FECHA DESC');
   if($queryNotasProyecto->num_rows!=0)
   {
   ?>
@@ -238,18 +293,19 @@ if($queryProyecto->num_rows!=0)
                           ?>
                         </tbody>
                     </table>
-                    <form>
+                    <form method="post">
                       <div class="row">
                           <div class="col-md-12">
                               <div class="form-group">
                                   <label>Nueva nota</label>
                                   <div class="form-group">
-                                      <textarea class="form-control" rows="2"></textarea>
+                                      <textarea class="form-control" name="notaInput" required rows="2"></textarea>
                                   </div>
                               </div>
                           </div>
                       </div>
-                      <button type="submit" class="btn btn-primary pull-right">Añadir nota</button>
+                      <input hidden name="submit" value="<?php echo $IDProyecto;?>">
+                      <button type="submit" name="addNoteSubmit" class="btn btn-primary pull-right">Añadir nota</button>
                     </form>
 
                 </div>
@@ -259,7 +315,7 @@ if($queryProyecto->num_rows!=0)
                         }
                           ?>
                           <?php
-                          $estadoProyectoQuery = $connection->query("SELECT * FROM ESTADO_PROYECTOS WHERE PROYECTO = ".$IDProyecto);
+                          $estadoProyectoQuery = $connection->query("SELECT * FROM ESTADO_PROYECTOS WHERE PROYECTO = ".$IDProyecto.' ORDER BY FECHA DESC');
                           if($estadoProyectoQuery->num_rows!=0)
                           {
                             ?>
@@ -329,18 +385,7 @@ if($queryProyecto->num_rows!=0)
                     </div>
                 </div>
             </div>
-            <footer class="footer ">
-                <div class="container-fluid">
 
-                    <div class="copyright pull-right">
-                        &copy;
-                        <script>
-                            document.write(new Date().getFullYear())
-                        </script>, made with love by
-                        <a href="https://www.creative-tim.com" target="_blank">Creative Tim</a> for a better web.
-                    </div>
-                </div>
-            </footer>
         </div>
     </div>
 </body>

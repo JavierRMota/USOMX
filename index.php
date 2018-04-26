@@ -241,18 +241,7 @@ if($queryUltimoMes->num_rows!=0)
                     </div>
                 </div>
             </div>
-            <footer class="footer ">
-                <div class="container-fluid">
-
-                    <div class="copyright pull-right">
-                        &copy;
-                        <script>
-                            document.write(new Date().getFullYear())
-                        </script>, made with love by
-                        <a href="https://www.creative-tim.com" target="_blank">Creative Tim</a> for a better web.
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
 </body>
