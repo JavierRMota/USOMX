@@ -1,6 +1,5 @@
 <?php
 require('connect.php');
-require('utils.php');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -13,7 +12,7 @@ require('utils.php');
     <link rel="apple-touch-icon" href="../assets/img/apple-icon.png">
     <link rel="icon" href="../assets/img/favicon.png">
     <title>
-        USO Inteligente - Inicio
+        USO Inteligente - Agregar proyecto
     </title>
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
@@ -64,12 +63,13 @@ require('utils.php');
                             <p>Añadido de Proyectos</p>
                         </a>
                     </li>
+                    <!--
                     <li class="nav-item">
                         <a class="nav-link" href="borrado.php">
                             <i class="material-icons">delete</i>
                             <p>Borrado de proyectos</p>
                         </a>
-                    </li>
+                    </li>-->
 
                 </ul>
             </div>
@@ -152,6 +152,15 @@ require('utils.php');
                   $nota ="Proyecto creado";
                   $queryAddNota = $connection->prepare('INSERT INTO NOTAS_PROYECTOS(USUARIO,PROYECTO, NOTA) VALUES(1,?,?)');
                   $queryAddNota->bind_param('is',$IDProyecto,$nota);
+                  ?>
+                  <div class="alert alert-success">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <i class="material-icons">close</i>
+                      </button>
+                      <span>
+                          <b> ÉXITO - </b> Proyecto agregado</span>
+                  </div>
+                  <?php
 
                 }
                 else

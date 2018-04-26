@@ -1,6 +1,5 @@
 <?php
 require('connect.php');
-require('utils.php');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -64,12 +63,13 @@ require('utils.php');
                             <p>Añadido de Proyectos</p>
                         </a>
                     </li>
+                    <!--
                     <li class="nav-item">
                         <a class="nav-link" href="borrado.php">
                             <i class="material-icons">delete</i>
                             <p>Borrado de proyectos</p>
                         </a>
-                    </li>
+                    </li>-->
 
                 </ul>
             </div>
@@ -125,7 +125,7 @@ require('utils.php');
                 <div class="container-fluid">
                     <div class="row">
 <?php
-$queryUltimoMes = $connection->query('SELECT * FROM UltimoMes');
+$queryUltimoMes = $connection->query('SELECT DISTINCT * FROM UltimoMes');
 if($queryUltimoMes->num_rows!=0)
 {
 ?>
@@ -241,7 +241,7 @@ if($queryUltimoMes->num_rows!=0)
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </body>

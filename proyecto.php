@@ -2,7 +2,6 @@
 if(isset($_POST['submit']))
 {
   require('connect.php');
-  require('utils.php');
   $IDProyecto= $_POST['submit'];
 ?>
 <!DOCTYPE html>
@@ -67,12 +66,13 @@ if(isset($_POST['submit']))
                             <p>Añadido de Proyectos</p>
                         </a>
                     </li>
+                    <!--
                     <li class="nav-item">
                         <a class="nav-link" href="borrado.php">
                             <i class="material-icons">delete</i>
                             <p>Borrado de proyectos</p>
                         </a>
-                    </li>
+                    </li>-->
 
                 </ul>
             </div>
