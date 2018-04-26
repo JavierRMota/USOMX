@@ -50,7 +50,7 @@ if(isset($_POST['submit']))
 
                 </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="index.php">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
                         </a>
